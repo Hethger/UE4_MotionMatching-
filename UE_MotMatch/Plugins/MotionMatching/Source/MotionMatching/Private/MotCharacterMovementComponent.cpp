@@ -2,7 +2,7 @@
 #include "MotCharacterMovementComponent.h"
 #include "MotionMatching.h"
 
-
+/*
 #include "Engine.h"
 #include "Animation/AnimationAsset.h"
 
@@ -14,14 +14,41 @@
 #include "Components/PrimitiveComponent.h"
 #include "Animation/AnimMontage.h"
 #include "Engine/NetworkObjectList.h"
+*/
+//___________________________________________________________________________________
 
+#include "EngineStats.h"
+#include "Components/PrimitiveComponent.h"
+#include "AI/NavigationSystemBase.h"
+#include "AI/Navigation/NavigationDataInterface.h"
+#include "UObject/Package.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PhysicsVolume.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/NetDriver.h"
+#include "DrawDebugHelpers.h"
+#include "GameFramework/GameNetworkManager.h"
+#include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/GameStateBase.h"
+#include "Engine/Canvas.h"
+#include "AI/Navigation/PathFollowingAgentInterface.h"
+#include "AI/Navigation/AvoidanceManager.h"
+#include "Components/BrushComponent.h"
+
+#include "Engine/DemoNetDriver.h"
+#include "Engine/NetworkObjectList.h"
+
+//#include "Net/PerfCountersHelpers.h"
+#include "ProfilingDebugging/CsvProfiler.h"
 
 
 void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 {
-	///SCOPE_CYCLE_COUNTER(STAT_CharacterMovementPerformMovement);
+//	SCOPE_CYCLE_COUNTER(STAT_CharacterMovementPerformMovement);
 
-	if (!HasValidData())
+	const UWorld* MyWorld = GetWorld();
+	if (!HasValidData() || MyWorld == nullptr)
 	{
 		return;
 	}
@@ -29,7 +56,7 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 	// no movement if we can't move, or if currently doing physical simulation on UpdatedComponent
 	if (MovementMode == MOVE_None || UpdatedComponent->Mobility != EComponentMobility::Movable || UpdatedComponent->IsSimulatingPhysics())
 	{
-		if (!CharacterOwner->bClientUpdating && CharacterOwner->IsPlayingRootMotion() && CharacterOwner->GetMesh() && !CharacterOwner->bServerMoveIgnoreRootMotion)
+		if (!CharacterOwner->bClientUpdating && !CharacterOwner->bServerMoveIgnoreRootMotion && CharacterOwner->IsPlayingRootMotion() && CharacterOwner->GetMesh())
 		{
 			// Consume root motion
 			TickCharacterPose(DeltaSeconds);
@@ -51,7 +78,7 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 		CurrentRootMotion.LastPreAdditiveVelocity += Adjustment;
 
 #if ROOT_MOTION_DEBUG
-		if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnAnyThread() == 1)
+		if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnGameThread() == 1)
 		{
 			if (!Adjustment.IsNearlyZero())
 			{
@@ -79,13 +106,13 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 		const bool bHasRootMotionSources = HasRootMotionSources();
 		if (bHasRootMotionSources && !CharacterOwner->bClientUpdating && !CharacterOwner->bServerMoveIgnoreRootMotion)
 		{
-			///SCOPE_CYCLE_COUNTER(STAT_CharacterMovementRootMotionSourceCalculate);
+			//SCOPE_CYCLE_COUNTER(STAT_CharacterMovementRootMotionSourceCalculate);
 
 			const FVector VelocityBeforeCleanup = Velocity;
 			CurrentRootMotion.CleanUpInvalidRootMotion(DeltaSeconds, *CharacterOwner, *this);
 
 #if ROOT_MOTION_DEBUG
-			if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnAnyThread() == 1)
+			if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnGameThread() == 1)
 			{
 				if (Velocity != VelocityBeforeCleanup)
 				{
@@ -104,7 +131,7 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 		ApplyAccumulatedForces(DeltaSeconds);
 
 		// Update the character state before we do our movement
-		UpdateCharacterStateBeforeMovement();
+		UpdateCharacterStateBeforeMovement(DeltaSeconds);
 
 		if (MovementMode == MOVE_NavWalking && bWantsToLeaveNavWalking)
 		{
@@ -116,7 +143,7 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 		ClearAccumulatedForces();
 
 #if ROOT_MOTION_DEBUG
-		if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnAnyThread() == 1)
+		if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnGameThread() == 1)
 		{
 			if (OldVelocity != Velocity)
 			{
@@ -135,7 +162,7 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 			CurrentRootMotion.LastPreAdditiveVelocity += Adjustment;
 
 #if ROOT_MOTION_DEBUG
-			if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnAnyThread() == 1)
+			if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnGameThread() == 1)
 			{
 				if (!Adjustment.IsNearlyZero())
 				{
@@ -199,7 +226,7 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 				if (SkelMeshComp)
 				{
 					// Convert Local Space Root Motion to world space. Do it right before used by physics to make sure we use up to date transforms, as translation is relative to rotation.
-					RootMotionParams.Set(SkelMeshComp->ConvertLocalRootMotionToWorld(RootMotionParams.GetRootMotionTransform()));
+					RootMotionParams.Set(ConvertLocalRootMotionToWorld(RootMotionParams.GetRootMotionTransform()));
 				}
 
 				// Then turn root motion to velocity to be used by various physics modes.
@@ -229,7 +256,7 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 					Velocity = NewVelocity;
 
 #if ROOT_MOTION_DEBUG
-					if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnAnyThread() == 1)
+					if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnGameThread() == 1)
 					{
 						if (VelocityBeforeOverride != Velocity)
 						{
@@ -244,7 +271,7 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 		}
 
 #if ROOT_MOTION_DEBUG
-		if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnAnyThread() == 1)
+		if (RootMotionSourceDebug::CVarDebugRootMotionSources.GetValueOnGameThread() == 1)
 		{
 			FString AdjustedDebugString = FString::Printf(TEXT("PerformMovement Velocity(%s) OldVelocity(%s)"),
 				*Velocity.ToCompactString(), *OldVelocity.ToCompactString());
@@ -253,10 +280,10 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 #endif
 
 		// NaN tracking
-		checkCode(ensureMsgf(!Velocity.ContainsNaN(), TEXT("UCharacterMovementComponent::PerformMovement: Velocity contains NaN (%s)\n%s"), *GetPathNameSafe(this), *Velocity.ToString()));
+		//devCode(ensureMsgf(!Velocity.ContainsNaN(), TEXT("UCharacterMovementComponent::PerformMovement: Velocity contains NaN (%s)\n%s"), *GetPathNameSafe(this), *Velocity.ToString()));
 
 		// Clear jump input now, to allow movement events to trigger it for next update.
-		CharacterOwner->ClearJumpInput();
+		CharacterOwner->ClearJumpInput(DeltaSeconds);
 
 		// change position
 		StartNewPhysics(DeltaSeconds, 0);
@@ -267,7 +294,7 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 		}
 
 		// Update character state based on change from movement
-		UpdateCharacterStateAfterMovement();
+		UpdateCharacterStateAfterMovement(DeltaSeconds);
 
 		if ((bAllowPhysicsRotationDuringAnimRootMotion || !HasAnimRootMotion()) && !CharacterOwner->IsMatineeControlled())
 		{
@@ -294,13 +321,13 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 				const FRotator ResultingRotation = UpdatedComponent->GetComponentRotation();
 
 				// Show current position
-				DrawDebugCoordinateSystem(GetWorld(), CharacterOwner->GetMesh()->GetComponentLocation() + FVector(0, 0, 1), ResultingRotation, 50.f, false);
+				DrawDebugCoordinateSystem(MyWorld, CharacterOwner->GetMesh()->GetComponentLocation() + FVector(0, 0, 1), ResultingRotation, 50.f, false);
 
 				// Show resulting delta move.
-				DrawDebugLine(GetWorld(), OldLocation, ResultingLocation, FColor::Red, true, 10.f);
+				DrawDebugLine(MyWorld, OldLocation, ResultingLocation, FColor::Red, true, 10.f);
 
 				// Log details.
-				UE_LOG(LogRootMotion, Warning, TEXT("PerformMovement Resulting DeltaMove Translation: %s, Rotation: %s, MovementBase: %s"),
+				UE_LOG(LogRootMotion, Warning, TEXT("PerformMovement Resulting DeltaMove Translation: %s, Rotation: %s, MovementBase: %s"), //-V595
 					*(ResultingLocation - OldLocation).ToCompactString(), *(ResultingRotation - OldActorRotation).GetNormalized().ToCompactString(), *GetNameSafe(CharacterOwner->GetMovementBase()));
 
 				const FVector RMTranslation = RootMotionParams.GetRootMotionTransform().GetTranslation();
@@ -320,10 +347,10 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 		OnMovementUpdated(DeltaSeconds, OldLocation, OldVelocity);
 	} // End scoped movement update
 
-	  // Call external post-movement events. These happen after the scoped movement completes in case the events want to use the current state of overlaps etc.
+	// Call external post-movement events. These happen after the scoped movement completes in case the events want to use the current state of overlaps etc.
 	CallMovementUpdateDelegate(DeltaSeconds, OldLocation, OldVelocity);
 
-	MaybeSaveBaseLocation();
+	SaveBaseLocation();
 	UpdateComponentVelocity();
 
 	const bool bHasAuthority = CharacterOwner && CharacterOwner->HasAuthority();
@@ -331,20 +358,16 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 	// If we move we want to avoid a long delay before replication catches up to notice this change, especially if it's throttling our rate.
 	if (bHasAuthority && UNetDriver::IsAdaptiveNetUpdateFrequencyEnabled() && UpdatedComponent)
 	{
-		const UWorld* MyWorld = GetWorld();
-		if (MyWorld)
+		UNetDriver* NetDriver = MyWorld->GetNetDriver();
+		if (NetDriver && NetDriver->IsServer())
 		{
-			UNetDriver* NetDriver = MyWorld->GetNetDriver();
-			if (NetDriver && NetDriver->IsServer())
-			{
-				FNetworkObjectInfo* NetActor = NetDriver->GetNetworkObjectInfo(CharacterOwner);
+			FNetworkObjectInfo* NetActor = NetDriver->FindOrAddNetworkObjectInfo(CharacterOwner);
 
-				if (NetActor && MyWorld->GetTimeSeconds() <= NetActor->NextUpdateTime && NetDriver->IsNetworkActorUpdateFrequencyThrottled(*NetActor))
+			if (NetActor && MyWorld->GetTimeSeconds() <= NetActor->NextUpdateTime && NetDriver->IsNetworkActorUpdateFrequencyThrottled(*NetActor))
+			{
+				if (ShouldCancelAdaptiveReplication())
 				{
-					if (ShouldCancelAdaptiveReplication())
-					{
-						NetDriver->CancelAdaptiveReplication(*NetActor);
-					}
+					NetDriver->CancelAdaptiveReplication(*NetActor);
 				}
 			}
 		}
@@ -359,8 +382,18 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 		const bool bRotationChanged = (NewRotation != LastUpdateRotation);
 		if (bLocationChanged || bRotationChanged)
 		{
-			const UWorld* MyWorld = GetWorld();
-			ServerLastTransformUpdateTimeStamp = MyWorld ? MyWorld->GetTimeSeconds() : 0.f;
+			// Update ServerLastTransformUpdateTimeStamp. This is used by Linear smoothing on clients to interpolate positions with the correct delta time,
+			// so the timestamp should be based on the client's move delta (ServerAccumulatedClientTimeStamp), not the server time when receiving the RPC.
+			const bool bIsRemotePlayer = (CharacterOwner->GetRemoteRole() == ROLE_AutonomousProxy);
+			const FNetworkPredictionData_Server_Character* ServerData = bIsRemotePlayer ? GetPredictionData_Server_Character() : nullptr;
+			if (bIsRemotePlayer && ServerData)// && CharacterMovementCVars::NetUseClientTimestampForReplicatedTransform)
+			{
+				ServerLastTransformUpdateTimeStamp = float(ServerData->ServerAccumulatedClientTimeStamp);
+			}
+			else
+			{
+				ServerLastTransformUpdateTimeStamp = MyWorld->GetTimeSeconds();
+			}
 		}
 	}
 
@@ -368,6 +401,9 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 	LastUpdateRotation = NewRotation;
 	LastUpdateVelocity = Velocity;
 }
+
+
+
 
 UMotCharacterMovementComponent::UMotCharacterMovementComponent(const FObjectInitializer & ObjectInitializer)
 	: AllowRootMotionOverride(false)

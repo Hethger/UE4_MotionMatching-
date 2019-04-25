@@ -16,19 +16,30 @@ FAnimNode_MotionField::FAnimNode_MotionField()
 	, ChangeAmountLimit(2)
 	, DrawDebug(false)
 	//, NumPointsPerSecond(10)
-	, Vel(FVector(0.f))//, PresentTrajectory(FTrajectoryData())
-	, PlayRate(1.f)
 	, BlendTime(0.3f)
 	, CurrentAnimIndex(0)
-	, CurrentAnimTime(2.f)
-	, bLoopAnimation(true)
-	, ChangeCounter(0)
+
+	
+
+	
+
+	
+
+
+	
 	, ChangeTimer(0.f)
-	, Pause(false)
-	, Switch(false)
+
 	, LastSwitch(false)
-	, AuthorSwitch(false)
+	, Pause(false)
 {
+	Vel = FVector(0.f);//, PresentTrajectory(FTrajectoryData())
+	CurrentAnimTime = 2.f;
+	PlayRate=(1.f);
+	bLoopAnimation = (true);
+    Switch = (false);
+	ChangeCounter = (0);
+	AuthorSwitch = (false);
+
 	//TrajectoryPoints.Empty();
 	LastBones.Empty();
 	JointsData.Empty();
@@ -61,7 +72,7 @@ void FAnimNode_MotionField::Initialize_AnyThread(const FAnimationInitializeConte
 
 	FAnimNode_Base::Initialize_AnyThread(Context);
 
-	EvaluateGraphExposedInputs.Execute(Context);
+	GetEvaluateGraphExposedInputs().Execute(Context);
 
 	InternalTimeAccumulator = 0.f;
 
@@ -109,7 +120,7 @@ void FAnimNode_MotionField::CacheBones_AnyThread(const FAnimationCacheBonesConte
 
 void FAnimNode_MotionField::UpdateAssetPlayer(const FAnimationUpdateContext& Context)
 {
-	EvaluateGraphExposedInputs.Execute(Context);
+	GetEvaluateGraphExposedInputs().Execute(Context);
 
 	//FString JO = TEXT("TIME COMPARISON  :: TESTO  ") + FString::SanitizeFloat( + Context.AnimInstanceProxy->GetDeltaSeconds()) + TEXT(" : This the real : ") + FString::SanitizeFloat(CopyTime);
 	//GEngine->AddOnScreenDebugMessage(-1, 1.02f, FColor::Yellow, JO); Context.AnimInstanceProxy->GetSkelMeshComponent()->GetSocketTransform(TEXT("root"), RTS_World).GetTranslation()

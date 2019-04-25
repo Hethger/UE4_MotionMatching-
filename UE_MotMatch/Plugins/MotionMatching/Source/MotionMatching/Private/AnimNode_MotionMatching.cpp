@@ -48,13 +48,14 @@ FAnimNode_MotionMatching::FAnimNode_MotionMatching()
 	, Responsiveness(1.f)
 	, VelocityStrength(1.f)
 	, PoseStrength(1.f)
-	, PlayRate(1.f)
 	, BlendTime(0.3f)
+	, PlayRate(1.f)
 	, ChangeTimeLimit(0.1f)
 	, MaxChanges(2)
-	, bLoopAnimation(true)
 	, ChangeCounter(0)
+
 	, ChangeTimer(0.f)
+	, bLoopAnimation(true)
 {
 	TagsToLookFor.Empty();
 	TagsToIgnore.Empty();
@@ -88,7 +89,7 @@ void FAnimNode_MotionMatching::Initialize_AnyThread(const FAnimationInitializeCo
 
 	FAnimNode_Base::Initialize_AnyThread(Context);
 
-	EvaluateGraphExposedInputs.Execute(Context);
+	GetEvaluateGraphExposedInputs().Execute(Context);
 	
 	InternalTimeAccumulator = 0.f;
 	if (MotionField)
@@ -116,7 +117,7 @@ void FAnimNode_MotionMatching::CacheBones_AnyThread(const FAnimationCacheBonesCo
 
 void FAnimNode_MotionMatching::UpdateAssetPlayer(const FAnimationUpdateContext& Context)
 {
-	EvaluateGraphExposedInputs.Execute(Context);
+	GetEvaluateGraphExposedInputs().Execute(Context);
 
 	if (MotionField)
 	{
