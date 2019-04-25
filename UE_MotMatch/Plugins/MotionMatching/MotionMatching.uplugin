@@ -1,0 +1,35 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Motion Matching",
+	"Description": "Implementation of Motion Matching",
+	"Category": "Animation",
+	"CreatedBy": "Theodor Luis Martin Bruna (Hethger)",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"EngineVersion": "4.22.0",
+	"CanContainContent": false,
+	"IsBetaVersion": true,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "MotionMatching",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault",
+			"BlacklistPlatforms": [
+				"IOS"
+			]
+		},
+		{
+			"Name": "MotionMatchingEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PreDefault",
+			"BlacklistPlatforms": [
+				"IOS"
+			]
+		}
+	]
+}
