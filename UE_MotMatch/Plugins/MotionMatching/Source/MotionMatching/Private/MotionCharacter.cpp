@@ -213,7 +213,7 @@ void AMotionCharacter::DrawDebugMotionData(const float LifeTime)
 		FVector LastPos = RootTM.TransformPosition(JointsData[i].BoneCSPos);
 		FVector LastVel = RootTM.TransformVector(JointsData[i].BoneCSVel.GetSafeNormal()) * JointsData[i].BoneCSVel.Size();
 
-		DrawDebugSphere(GetWorld(), LastPos, 10.f, 12, FColor::Yellow, false, LifeTime, .5f);
+		DrawDebugSphere(GetWorld(), LastPos, 10.f, 12, FColor::Yellow, false, LifeTime, 0, 0.5f);
 		//FTransform BoneTM = Context.AnimInstanceProxy->GetSkelMeshComponent()->GetSocketTransform(MotionField->MotionBones[i], RTS_Component) * RootTM;
 		//Context.AnimInstanceProxy->AnimDrawDebugSphere(BoneTM.GetTranslation(), 10.f, 12, FColor::Magenta, false, LifeTime, 0.5f);
 
@@ -231,7 +231,7 @@ void AMotionCharacter::DrawDebugMotionData(const float LifeTime)
 
 		FVector WinnerPos = RootTM.TransformPosition(MotionField->MotionKeys[MotionKeyIndex].MotionJointData[i].BoneCSPos);
 		FVector WinnerVel = RootTM.TransformVector(MotionField->MotionKeys[MotionKeyIndex].MotionJointData[i].BoneCSVel.GetSafeNormal()) * MotionField->MotionKeys[MotionKeyIndex].MotionJointData[i].BoneCSVel.Size();
-		DrawDebugSphere(GetWorld(), WinnerPos, 10.f, 12, FColor::Green, false, LifeTime, 2.f);
+		DrawDebugSphere(GetWorld(), WinnerPos, 10.f, 12, FColor::Green, false, LifeTime, 0, 2.f);
 		DrawDebugLine
 		(
 			GetWorld(),

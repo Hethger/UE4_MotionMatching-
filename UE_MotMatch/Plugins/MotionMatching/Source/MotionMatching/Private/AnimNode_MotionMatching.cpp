@@ -18,7 +18,7 @@ bool FMotionAnim::ApplyTime(const float DT, const float InBlendTime, const bool 
 	{
 		BlendTime = FMath::Clamp(BlendTime - DT, 0.f, InBlendTime);
 		
-		if ((BlendTime == 0.f))
+		if (BlendTime == 0.f)
 		{
 			return true;
 		}
