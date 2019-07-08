@@ -310,8 +310,6 @@ float FMotionKeyUtils::CompareJointDatas(const TArray<FJointData> JointData_A, c
 			PoseCost += JointData_A[i].CompareTo(JointData_B[i]);
 		}
 
-		PoseCost;
-
 		return PoseCost;
 	}
 	return -666.f;

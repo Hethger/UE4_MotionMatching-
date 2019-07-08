@@ -87,9 +87,9 @@ void FAnimNode_MotionField::Initialize_AnyThread(const FAnimationInitializeConte
 	for (int i = 0; i < MotionField->MotionBones.Num(); i++)
 	{
 		FJointData JD = FJointData();
-		FVector Vel = Context.AnimInstanceProxy->GetSkelMeshComponent()->GetPhysicsLinearVelocity(MotionField->MotionBones[i]);
-		float Size = Vel.Size();
-		JD.BoneCSVel = Context.AnimInstanceProxy->GetComponentTransform().InverseTransformVectorNoScale(Vel.GetSafeNormal()) * Size;
+		FVector Velocity = Context.AnimInstanceProxy->GetSkelMeshComponent()->GetPhysicsLinearVelocity(MotionField->MotionBones[i]);
+		float Size = Velocity.Size();
+		JD.BoneCSVel = Context.AnimInstanceProxy->GetComponentTransform().InverseTransformVectorNoScale(Velocity.GetSafeNormal()) * Size;
 		JD.BoneCSPos = Context.AnimInstanceProxy->GetSkelMeshComponent()->GetSocketTransform(MotionField->MotionBones[i], RTS_Component).GetTranslation();
 
 		JointsData.Add(JD);
@@ -172,7 +172,6 @@ void FAnimNode_MotionField::Evaluate_AnyThread(FPoseContext & Output)
 		Pose2.Pose.CopyBonesFrom(LastBones);
 		FAnimationRuntime::BlendTwoPosesTogether(Pose1.Pose, Pose2.Pose, Pose1.Curve, Pose2.Curve, BlendTimer / BlendTime, Output.Pose, Output.Curve);
 
-		/*
 		if (UAnimSequence* LastSequence = GetLastAnim())
 		{
 		LastSequence->GetAnimationPose(Pose2.Pose, Pose2.Curve, FAnimExtractContext(LastAnimTime, true));
@@ -342,10 +341,10 @@ void FAnimNode_MotionField::PreEvaluate(const FAnimationUpdateContext & Context)
 				FTransform BoneTM = Context.AnimInstanceProxy->GetSkelMeshComponent()->GetSocketTransform(MotionField->MotionBones[i], RTS_Component);
 				//FMotionKeyUtils::GetAnimBoneLocalTM(GetCurrentAnim(), CurrentAnimTime, CurrentIndex, BoneTM);
 
-				const FVector Vel = BoneTM.GetTranslation() - JointsData[i].BoneCSPos;
+				const FVector Velocity = BoneTM.GetTranslation() - JointsData[i].BoneCSPos;
 				//Context.AnimInstanceProxy->GetSkelMeshComponent()->GetPhysicsLinearVelocity(MotionField->MotionBones[i]);
 
-				JointsData[i].BoneCSVel = (Vel.GetSafeNormal()) * (Vel.Size() / DT);
+				JointsData[i].BoneCSVel = (Velocity.GetSafeNormal()) * (Velocity.Size() / DT);
 				JointsData[i].BoneCSPos = BoneTM.GetTranslation();
 			}
 
