@@ -13,7 +13,7 @@
 
 #include "AssetTypeActions_MotionField.h"
 
-#include "AddNewContextDialog.h"
+#include "MotionFieldEditor/AddNewContextDialog.h"
 
 static const FName MotionMatchingEditorTabName("MotionMatchingEditor");
 
@@ -21,12 +21,12 @@ static const FName MotionMatchingEditorTabName("MotionMatchingEditor");
 
 void FMotionMatchingEditorModule::StartupModule()
 {
+	// check(GEditor);
+
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	MotionFieldEditor_ToolBarExtensibilityManager = MakeShareable(new FExtensibilityManager);
 
 	FMotionMatchingStyle::Initialize();
-	
-	
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 	RegisterAssetTypeAction(AssetTools, MakeShareable(new FAssetTypeActions_MotionField()));
 	

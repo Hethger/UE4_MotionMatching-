@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "MotionFieldEditorViewportClient.h"
+#include "MotionFieldEditor/MotionFieldEditorViewportClient.h"
 
 
 
@@ -16,8 +16,7 @@
 
 #include "AssetEditorModeManager.h"
 
-
-#include "Classes/AnimPreviewInstance.h"
+#include "AnimPreviewInstance.h"
 
 #include "Animation/DebugSkelMeshComponent.h"
 #include "Components/PoseableMeshComponent.h"
@@ -39,7 +38,7 @@
 
 #include "Engine/StaticMesh.h"
 
-#include "MotionFieldEditor.h"
+#include "MotionFieldEditor/MotionFieldEditor.h"
 
 #include "MotionKeyUtils.h"
 

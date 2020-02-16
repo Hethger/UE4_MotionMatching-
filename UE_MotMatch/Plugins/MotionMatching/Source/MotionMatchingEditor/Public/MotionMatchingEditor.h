@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ModuleManager.h"
+#include "Modules/ModuleManager.h"
 
 #include "CoreMinimal.h"
 #include "Toolkits/AssetEditorToolkit.h"

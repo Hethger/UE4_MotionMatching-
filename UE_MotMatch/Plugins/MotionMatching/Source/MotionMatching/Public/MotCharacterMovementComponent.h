@@ -20,8 +20,8 @@ public:
 	UMotCharacterMovementComponent(const FObjectInitializer& ObjectInitializer);
 	UPROPERTY(Category = "Character Movement: Root Motion", EditAnywhere, BlueprintReadWrite)
 		bool AllowRootMotionOverride;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Category = "Character Movement: Root Motion", BlueprintReadOnly)
 		bool OverrideRootMotion;
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Category = "Character Movement: Root Motion", BlueprintReadOnly)
 		FTransform OverridenRootMotion;
 };

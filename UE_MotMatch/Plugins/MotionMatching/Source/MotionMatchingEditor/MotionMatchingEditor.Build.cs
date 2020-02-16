@@ -7,14 +7,6 @@ public class MotionMatchingEditor : ModuleRules
 	public MotionMatchingEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-
-        PublicIncludePaths.AddRange(
-			new string[] {
-                "MotionMatchingEditor/Public"
-				// ... add public include paths required here ...
-			}
-			);
-				
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {

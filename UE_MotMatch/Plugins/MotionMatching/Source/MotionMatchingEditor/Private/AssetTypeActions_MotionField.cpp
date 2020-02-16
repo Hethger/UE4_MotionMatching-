@@ -3,7 +3,7 @@
 #include "AssetTypeActions_MotionField.h"
 #include "MotionMatchingEditor.h"
 
-#include "MotionFieldEditor.h"
+#include "MotionFieldEditor/MotionFieldEditor.h"
 
 #include "MotionField.h"
 
