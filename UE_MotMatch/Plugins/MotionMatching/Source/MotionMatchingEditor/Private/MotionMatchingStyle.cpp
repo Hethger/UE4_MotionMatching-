@@ -2,10 +2,9 @@
 #include "MotionMatchingStyle.h"
 #include "MotionMatchingEditor.h"
 
+#include "Interfaces/IPluginManager.h"
+#include "Slate/SlateGameResources.h"
 
-#include "SlateGameResources.h"
-
-#include "IPluginManager.h"
 
 TSharedPtr< FSlateStyleSet > FMotionMatchingStyle::StyleInstance = NULL;
 

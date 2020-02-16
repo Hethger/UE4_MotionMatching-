@@ -1,33 +1,28 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "MotionFieldEditor.h"
-
-#include "EditorViewportClient.h"
-#include "UObject/Package.h"
-#include "Modules/ModuleManager.h"
-#include "EditorStyleSet.h"
-#include "SSingleObjectDetailsPanel.h"
-
-
-#include "SEditorViewport.h"
-#include "ScopedTransaction.h"
+#include "MotionFieldEditor/MotionFieldEditor.h"
+#include "MotionMatchingEditor.h"
 #include "MotionFieldEditor/MotionFieldEditorViewportClient.h"
 #include "MotionFieldEditor/MotionFieldEditorCommands.h"
-
-#include "MotionMatchingEditor.h"
-
-#include "SCommonEditorViewportToolbarBase.h"
 #include "MotionFieldEditor/SMotionFieldEditorViewportToolbar.h"
-#include "SScrubControlPanel.h"
 #include "MotionFieldEditor/SMotionFieldTimeline.h"
-#include "Widgets/Docking/SDockTab.h"
-#include "Framework/Commands/GenericCommands.h"
+#include "MotionFieldEditor/SContextList.h"
 
+#include "AnimPreviewInstance.h"
+#include "EditorStyleSet.h"
+#include "EditorViewportClient.h"
+#include "ScopedTransaction.h"
+#include "SEditorViewport.h"
+#include "SCommonEditorViewportToolbarBase.h"
+#include "SScrubControlPanel.h"
+#include "SSingleObjectDetailsPanel.h"
 #include "Animation/DebugSkelMeshComponent.h"
+#include "Framework/Commands/GenericCommands.h"
+#include "Modules/ModuleManager.h"
+#include "Subsystems/AssetEditorSubsystem.h"
+#include "UObject/Package.h"
+#include "Widgets/Docking/SDockTab.h"
 
-#include "Classes/AnimPreviewInstance.h"
-
-#include "SContextList.h"
 
 #define LOCTEXT_NAMESPACE "MotionFieldEditor"
 
@@ -307,7 +302,7 @@ void FMotionFieldEditor::UnregisterTabSpawners(const TSharedRef<class FTabManage
 
 void FMotionFieldEditor::InitMotionFieldEditor(const EToolkitMode::Type Mode, const TSharedPtr< class IToolkitHost >& InitToolkitHost, class UMotionField* InitMotionField)
 {
-	FAssetEditorManager::Get().CloseOtherEditors(InitMotionField, this);
+	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->CloseOtherEditors(InitMotionField, this);
 	MotionFieldBeingEdited = InitMotionField;
 
 	CurrentExtractionContextIndex = INDEX_NONE;

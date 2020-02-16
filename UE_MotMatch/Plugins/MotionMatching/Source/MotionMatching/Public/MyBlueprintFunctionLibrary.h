@@ -6,7 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 
 #include "Animation/AnimSequence.h"
-#include "Public/BonePose.h"
+#include "BonePose.h"
 
 #include "MotionKeyUtils.h"
 

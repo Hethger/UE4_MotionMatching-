@@ -189,7 +189,7 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 				}
 
 				// For local human clients, save off root motion data so it can be used by movement networking code.
-				if (CharacterOwner->IsLocallyControlled() && (CharacterOwner->Role == ROLE_AutonomousProxy) && CharacterOwner->IsPlayingNetworkedRootMotionMontage())
+				if (CharacterOwner->IsLocallyControlled() && (CharacterOwner->GetLocalRole() == ROLE_AutonomousProxy) && CharacterOwner->IsPlayingNetworkedRootMotionMontage())
 				{
 					CharacterOwner->ClientRootMotionParams = RootMotionParams;
 				}
@@ -202,7 +202,7 @@ void UMotCharacterMovementComponent::PerformMovement(float DeltaSeconds)
 			}
 
 			// For local human clients, save off root motion data so it can be used by movement networking code.
-			if (CharacterOwner->IsLocallyControlled() && (CharacterOwner->Role == ROLE_AutonomousProxy))
+			if (CharacterOwner->IsLocallyControlled() && (CharacterOwner->GetLocalRole() == ROLE_AutonomousProxy))
 			{
 				CharacterOwner->SavedRootMotion = CurrentRootMotion;
 			}

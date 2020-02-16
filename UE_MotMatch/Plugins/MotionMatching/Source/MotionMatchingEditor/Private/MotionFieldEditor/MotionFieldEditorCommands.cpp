@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "MotionFieldEditorCommands.h"
+#include "MotionFieldEditor/MotionFieldEditorCommands.h"
 
 //////////////////////////////////////////////////////////////////////////
 // FMotionFieldEditorCommands

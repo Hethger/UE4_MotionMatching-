@@ -1,18 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "SContextList.h"
+#include "MotionFieldEditor/SContextList.h"
+#include "MotionFieldEditor/AddNewContextDialog.h"
 
 #include "IContentBrowserSingleton.h"
 #include "ContentBrowserModule.h"
 #include "SScrubControlPanel.h"
 #include "EditorStyleSet.h"
-#include "SBorder.h"
-#include "SScrollBox.h"
-#include "SBox.h"
-#include "SButton.h"
-#include "STextBlock.h"
+#include "Widgets/Layout/SBorder.h"
+#include "Widgets/Layout/SScrollBox.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/Input/SButton.h"
+#include "Widgets/Text/STextBlock.h"
 //#include "PaperSprite.h"
-#include "AddNewContextDialog.h"
 
 
 #include "PropertyCustomizationHelpers.h"

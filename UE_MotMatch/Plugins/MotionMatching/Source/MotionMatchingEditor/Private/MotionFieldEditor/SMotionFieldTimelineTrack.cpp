@@ -1,33 +1,33 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "SMotionFieldTimelineTrack.h"
+#include "MotionFieldEditor/SMotionFieldTimelineTrack.h"  // Motion Matching Editor / Motion Field Editor
 
-#include "Widgets/SBoxPanel.h"
-#include "Widgets/SOverlay.h"
-#include "Layout/WidgetPath.h"
+#include "MotionFieldEditor/MotionFieldEditor.h"  // Motion Matching Editor / Motion Field Editor
+#include "MotionFieldEditor/MotionFieldEditorCommands.h"  // Motion Matching Editor / Motion Field Editor
+
+#include "MotionField.h"  // Motion Matching
+#include "MotionMatchingStyle.h"  // Motion Matching Editor
+
+
+#include "Editor.h"
+#include "AssetData.h"
+#include "PropertyCustomizationHelpers.h"
+
+#include "Animation/AnimSequence.h"
+#include "DragAndDrop/AssetDragDropOp.h"
 #include "Framework/Application/MenuStack.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Commands/UICommandList.h"
+#include "Framework/MultiBox/MultiBoxBuilder.h"
+#include "Framework/Commands/GenericCommands.h"
+#include "Layout/WidgetPath.h"
+#include "Toolkits/AssetEditorManager.h"
+#include "Widgets/SBoxPanel.h"
+#include "Widgets/SOverlay.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Layout/SBox.h"
-#include "Framework/MultiBox/MultiBoxBuilder.h"
-#include "AssetData.h"
-#include "Framework/Commands/GenericCommands.h"
 
-#include "MotionMatchingStyle.h"
-
-#include "MotionFieldEditor/MotionFieldEditorCommands.h"
-
-#include "DragAndDrop/AssetDragDropOp.h"
-#include "Editor.h"
-#include "PropertyCustomizationHelpers.h"
-#include "MotionField.h"
-#include "Toolkits/AssetEditorManager.h"
-
-#include "Animation/AnimSequence.h"
-
-#include "MotionFieldEditor.h"
 
 #define LOCTEXT_NAMESPACE "MotionFieldEditor"
 

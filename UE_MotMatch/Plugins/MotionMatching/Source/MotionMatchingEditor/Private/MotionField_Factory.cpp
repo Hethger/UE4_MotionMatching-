@@ -37,9 +37,9 @@
 #include "IAssetTools.h"
 #include "AssetToolsModule.h"
 
-#include "SScrollBox.h"
-#include "SCheckBox.h"
-#include "SColorBlock.h"
+#include "Widgets/Layout/SScrollBox.h"
+#include "Widgets/Input/SCheckBox.h"
+#include "Widgets/Colors/SColorBlock.h"
 //#include "STreeView.h"
 
 

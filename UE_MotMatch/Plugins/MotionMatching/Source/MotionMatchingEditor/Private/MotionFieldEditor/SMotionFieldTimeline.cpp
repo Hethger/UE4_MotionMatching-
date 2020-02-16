@@ -1,31 +1,32 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "SMotionFieldTimeline.h"
+#include "MotionFieldEditor/SMotionFieldTimeline.h"  // Motion Matching / Motion Field Editor
 
+#include "MotionFieldEditor/MotionFieldEditor.h"  // Motion Matching / Motion Field Editor
+#include "MotionFieldEditor/MotionFieldEditorCommands.h"  // Motion Matching / Motion Field Editor
+#include "MotionFieldEditor/SMotionFieldTimelineTrack.h"  // Motion Matching / Motion Field Editor
 
+#include "MotionKey.h"  // Motion Matching
+#include "MotionField.h"  // Motion Matching
+
+#include "EditorStyleSet.h"
+#include "ScopedTransaction.h"
+
+#include "Animation/AnimSequence.h"
 #include "Rendering/DrawElements.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/SOverlay.h"
 #include "Layout/WidgetPath.h"
 #include "Framework/Application/MenuStack.h"
 #include "Framework/Application/SlateApplication.h"
+#include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Layout/SBox.h"
-#include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "Widgets/Layout/SScrollBox.h"
 #include "Widgets/Colors/SColorBlock.h"
-#include "EditorStyleSet.h"
-#include "MotionField.h"
 #include "DragAndDrop/AssetDragDropOp.h"
-#include "ScopedTransaction.h"
-#include "MotionFieldEditor/MotionFieldEditorCommands.h"
-#include "MotionKey.h"
-#include "MotionFieldEditor/SMotionFieldTimelineTrack.h"
 
-#include "MotionFieldEditor.h"
-
-#include "Animation/AnimSequence.h"
 
 #define LOCTEXT_NAMESPACE "MotionFieldEditor"
 
@@ -444,8 +445,7 @@ FReply SSetPropertiesDialog::CancelClicked()
 
 void SSetPropertiesDialog::CloseContainingWindow()
 {
-	FWidgetPath WidgetPath;
-	TSharedPtr<SWindow> ContainingWindow = FSlateApplication::Get().FindWidgetWindow(AsShared(), WidgetPath);
+	TSharedPtr<SWindow> ContainingWindow = FSlateApplication::Get().FindWidgetWindow(AsShared());
 	if (ContainingWindow.IsValid())
 	{
 		ContainingWindow->RequestDestroyWindow();

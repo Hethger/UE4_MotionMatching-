@@ -9,9 +9,9 @@ void FMotionMatchingModule::StartupModule()
 
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 #if    WITH_EDITOR
-	FModuleManager::Get().LoadModule(TEXT("BlueprintGraph"));
-	FModuleManager::Get().LoadModule(TEXT("AnimGraph"));
-	FModuleManager::Get().LoadModule(TEXT("MotionMatchingEditor"));
+	// FModuleManager::Get().LoadModule(TEXT("BlueprintGraph"));
+	// FModuleManager::Get().LoadModule(TEXT("AnimGraph"));
+	// FModuleManager::Get().LoadModule(TEXT("MotionMatchingEditor"));
 #endif
 }
 
