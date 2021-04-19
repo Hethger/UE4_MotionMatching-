@@ -147,7 +147,7 @@ void FAnimNode_MotionMatching::Evaluate_AnyThread(FPoseContext & Output)
 		{
 			FTransform RootMotion;
 
-			GetBlendPose(Output.AnimInstanceProxy->GetDeltaSeconds(), RootMotion, Output.Pose, Output.Curve);
+			GetBlendPose(Output.AnimInstanceProxy->GetDeltaSeconds(), RootMotion, Output.Pose, Output.Curve, Output.CustomAttributes);
 			
 			///// Root Motion Setting using this hack for now as I want to make sure I blend Root Motion properly before
 			///// Doing a full on implementation
@@ -159,7 +159,9 @@ void FAnimNode_MotionMatching::Evaluate_AnyThread(FPoseContext & Output)
 		}
 		else
 		{
-			GetCurrentAnim()->GetAnimationPose(Output.Pose, Output.Curve, FAnimExtractContext(m_Anims.Last().Position, true));
+
+			FAnimationPoseData PoseData(Output.Pose, Output.Curve, Output.CustomAttributes);
+			GetCurrentAnim()->GetAnimationPose(PoseData, FAnimExtractContext(m_Anims.Last().Position, true));
 		}
 	}
 	else
@@ -318,7 +320,7 @@ void FAnimNode_MotionMatching::GetMotionData(TArray<FJointData>& OutJointData, F
 
 
 
-void FAnimNode_MotionMatching::GetBlendPose(const float DT, FTransform & OutRootMotion, FCompactPose & OutPose, FBlendedCurve & OutCurve)
+void FAnimNode_MotionMatching::GetBlendPose(const float DT, FTransform & OutRootMotion, FCompactPose & OutPose, FBlendedCurve & OutCurve, FStackCustomAttributes& CustomAttributes)
 {
 	const int32 NumPoses = m_Anims.Num();
 	OutRootMotion = FTransform::Identity;
@@ -356,7 +358,10 @@ void FAnimNode_MotionMatching::GetBlendPose(const float DT, FTransform & OutRoot
 
 				const float Time = FMath::Clamp<float>(m_Anims[I].Position, 0.f, AnimAtIndex(I)->SequenceLength);
 
-				AnimAtIndex(I)->GetAnimationPose(Pose, ChildrenCurves[I], FAnimExtractContext(Time, true));
+				FAnimationPoseData PoseDataInfo(Pose, ChildrenCurves[I], CustomAttributes);
+
+
+				AnimAtIndex(I)->GetAnimationPose(PoseDataInfo, FAnimExtractContext(Time, true));
 
 				ChildrenRootMotions[I] = AnimAtIndex(I)->ExtractRootMotion(Time - DT, DT, true);
 
@@ -397,13 +402,18 @@ void FAnimNode_MotionMatching::GetBlendPose(const float DT, FTransform & OutRoot
 		{
 			OutRootMotion = AnimAtIndex(NumPoses - 1)->ExtractRootMotion(m_Anims.Last().Position - DT, DT, true);
 
-			GetCurrentAnim()->GetAnimationPose(OutPose, OutCurve, FAnimExtractContext(m_Anims.Last().Position, true));
+
+			FAnimationPoseData PoseInfo(OutPose, OutCurve, CustomAttributes);
+
+			GetCurrentAnim()->GetAnimationPose(PoseInfo, FAnimExtractContext(m_Anims.Last().Position, true));
 		}
 		
 	}
 	else
 	{
-		GetCurrentAnim()->GetAnimationPose(OutPose, OutCurve, FAnimExtractContext(m_Anims.Last().Position, true));
+		FAnimationPoseData PoseInfo(OutPose, OutCurve, CustomAttributes);
+
+		GetCurrentAnim()->GetAnimationPose(PoseInfo, FAnimExtractContext(m_Anims.Last().Position, true));
 	}
 }
 

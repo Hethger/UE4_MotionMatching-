@@ -159,7 +159,10 @@ void FAnimNode_MotionField::Evaluate_AnyThread(FPoseContext & Output)
 
 	if (UAnimSequence* Sequence = GetCurrentAnim())
 	{
-		Sequence->GetAnimationPose(Output.Pose, Output.Curve, FAnimExtractContext(CurrentAnimTime, true));
+
+		FAnimationPoseData PoseDataInfo(Output);
+
+		Sequence->GetAnimationPose(PoseDataInfo, FAnimExtractContext(CurrentAnimTime, true));
 		/*
 		if ((LastBones.Num() > 0) && (BlendTime > 0.f))
 		{
