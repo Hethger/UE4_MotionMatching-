@@ -63,7 +63,7 @@ float FAnimNode_MotionField::GetCurrentAssetLength()
 
 	UAnimSequence* Sequence = GetCurrentAnim();
 
-	return Sequence ? Sequence->SequenceLength : 0.0f;
+	return Sequence ? Sequence->GetPlayLength() : 0.0f;
 
 }
 
@@ -98,11 +98,11 @@ void FAnimNode_MotionField::Initialize_AnyThread(const FAnimationInitializeConte
 
 	if (Sequence != NULL)
 	{
-		InternalTimeAccumulator = FMath::Clamp(0.f, 0.f, Sequence->SequenceLength);
+		InternalTimeAccumulator = FMath::Clamp(0.f, 0.f, Sequence->GetPlayLength());
 
 		if (0.f == 0.f && (PlayRate * Sequence->RateScale) < 0.0f)
 		{
-			InternalTimeAccumulator = Sequence->SequenceLength;
+			InternalTimeAccumulator = Sequence->GetPlayLength();
 
 		}
 	}
@@ -139,7 +139,7 @@ void FAnimNode_MotionField::UpdateAssetPlayer(const FAnimationUpdateContext& Con
 
 	if ((GetCurrentAnim() != NULL) && (Context.AnimInstanceProxy->IsSkeletonCompatible(GetCurrentAnim()->GetSkeleton())))
 	{
-		InternalTimeAccumulator = FMath::Clamp(CurrentAnimTime, 0.f, GetCurrentAnim()->SequenceLength);
+		InternalTimeAccumulator = FMath::Clamp(CurrentAnimTime, 0.f, GetCurrentAnim()->GetPlayLength());
 
 		CreateTickRecordForNode(Context, GetCurrentAnim(), bLoopAnimation, PlayRate);
 	}

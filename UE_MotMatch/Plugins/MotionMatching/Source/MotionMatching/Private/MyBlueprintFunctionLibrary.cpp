@@ -11,7 +11,7 @@ void UMyBlueprintFunctionLibrary::PoseGetTest(const UAnimSequence * InSequence, 
 	FBlendedCurve BldCurve = FBlendedCurve();
 	FAnimExtractContext ExtracContex = FAnimExtractContext(AtTime, bExtractRootMotion);
 	*/
-	int Num = InSequence->GetAnimationTrackNames().Num();
+	int Num = InSequence->GetDataModel()->GetBoneAnimationTracks().Num();
 	FTransform OutTM = FTransform::Identity;
 
 	InSequence->GetBoneTransform(OutTM, 0, AtTime, false);
@@ -85,7 +85,7 @@ void UMyBlueprintFunctionLibrary::BuildGoal(FTrajectoryData & OutGoal, const FTr
 
 void UMyBlueprintFunctionLibrary::GetMotionDataFromAnimation(const UAnimSequence * InSequence, const float AtTime, TArray<FName> InMotionBoneNames, FTrajectoryData & OutPresentTrajectory, FTrajectoryData & OutFutureTrajectory, TArray<FJointData>& OutJointData, FTransform& OutPastTMRel)
 {
-	float TrueTime = FMath::Clamp(AtTime, 1.f, InSequence->SequenceLength);
+	float TrueTime = FMath::Clamp(AtTime, 1.f, InSequence->GetPlayLength());
 	FTransform PresentTM;
 	InSequence->GetBoneTransform(PresentTM, 0, TrueTime, false);
 

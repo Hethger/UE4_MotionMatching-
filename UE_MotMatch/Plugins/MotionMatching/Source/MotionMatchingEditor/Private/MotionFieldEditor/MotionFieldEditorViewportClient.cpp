@@ -17,7 +17,7 @@
 #include "AssetEditorModeManager.h"
 
 
-#include "Classes/AnimPreviewInstance.h"
+#include "AnimPreviewInstance.h"
 
 #include "Animation/DebugSkelMeshComponent.h"
 #include "Components/PoseableMeshComponent.h"
@@ -49,9 +49,6 @@
 FMotionFieldEditorViewportClientRoot::FMotionFieldEditorViewportClientRoot(const TWeakPtr<class SEditorViewport>& InEditorViewportWidget)
 	: FEditorViewportClient(new FAssetEditorModeManager(), nullptr, InEditorViewportWidget)
 {
-	bOwnsModeTools = true;
-
-
 	//ModifyCheckerboardTextureColors();
 	//@TODO: ModeTools->SetToolkitHost
 

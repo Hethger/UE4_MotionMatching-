@@ -31,7 +31,7 @@ void FMotionKeyUtils::ExtractAnimSmoothedRotation(FQuat & OutRot, const UAnimSeq
 {
 	TArray <float> Weights;
 	TArray <FTransform> Rots;
-	const float Time = FMath::Clamp(KeyTime - .5f, 0.f, InSequence->SequenceLength);
+	const float Time = FMath::Clamp(KeyTime - .5f, 0.f, InSequence->GetPlayLength());
 
 	for (int32 i = 0; i < 10; i++)
 	{

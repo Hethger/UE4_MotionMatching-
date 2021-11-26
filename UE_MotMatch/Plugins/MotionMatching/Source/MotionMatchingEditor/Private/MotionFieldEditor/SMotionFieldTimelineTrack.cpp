@@ -23,7 +23,7 @@
 #include "Editor.h"
 #include "PropertyCustomizationHelpers.h"
 #include "MotionField.h"
-#include "Toolkits/AssetEditorManager.h"
+//#include "Toolkits/AssetEditorManager.h"
 
 #include "Animation/AnimSequence.h"
 

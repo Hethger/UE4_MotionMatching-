@@ -80,7 +80,7 @@ float FAnimNode_MotionMatching::GetCurrentAssetLength()
 {
 	UAnimSequence* Sequence = GetCurrentAnim();
 
-	return Sequence ? Sequence->SequenceLength : 0.0f;
+	return Sequence ? Sequence->GetPlayLength() : 0.0f;
 
 }
 
@@ -98,11 +98,11 @@ void FAnimNode_MotionMatching::Initialize_AnyThread(const FAnimationInitializeCo
 
 			if (Sequence != NULL)
 			{
-				InternalTimeAccumulator = FMath::Clamp(0.f, 0.f, Sequence->SequenceLength);
+				InternalTimeAccumulator = FMath::Clamp(0.f, 0.f, Sequence->GetPlayLength());
 
 				if (0.f == 0.f && (PlayRate * Sequence->RateScale) < 0.0f)
 				{
-					InternalTimeAccumulator = Sequence->SequenceLength;
+					InternalTimeAccumulator = Sequence->GetPlayLength();
 
 				}
 			}
@@ -129,7 +129,7 @@ void FAnimNode_MotionMatching::UpdateAssetPlayer(const FAnimationUpdateContext& 
 
 			if ((GetCurrentAnim() != NULL) && (Context.AnimInstanceProxy->IsSkeletonCompatible(GetCurrentAnim()->GetSkeleton())))
 			{
-				InternalTimeAccumulator = FMath::Clamp(InternalTimeAccumulator, 0.f, GetCurrentAnim()->SequenceLength);
+				InternalTimeAccumulator = FMath::Clamp(InternalTimeAccumulator, 0.f, GetCurrentAnim()->GetPlayLength());
 
 				CreateTickRecordForNode(Context, GetCurrentAnim(), bLoopAnimation, PlayRate);
 			}
@@ -339,6 +339,9 @@ void FAnimNode_MotionMatching::GetBlendPose(const float DT, FTransform & OutRoot
 		TArray<FTransform> ChildrenRootMotions;
 		ChildrenRootMotions.AddZeroed(NumPoses);
 
+		TArray<FStackCustomAttributes, TInlineAllocator<8>> ChildrenAttributes;
+		ChildrenAttributes.AddZeroed(NumPoses);
+
 		for (int32 ChildrenIdx = 0; ChildrenIdx<ChildrenPoses.Num(); ++ChildrenIdx)
 		{
 			ChildrenPoses[ChildrenIdx].SetBoneContainer(&OutPose.GetBoneContainer());
@@ -356,7 +359,7 @@ void FAnimNode_MotionMatching::GetBlendPose(const float DT, FTransform & OutRoot
 				ChildrenWeights[I] = m_Anims[I].Weight * ((((float)(I + 1)) / ((float)NumPoses)));
 				Sum += ChildrenWeights[I];
 
-				const float Time = FMath::Clamp<float>(m_Anims[I].Position, 0.f, AnimAtIndex(I)->SequenceLength);
+				const float Time = FMath::Clamp<float>(m_Anims[I].Position, 0.f, AnimAtIndex(I)->GetPlayLength());
 
 				FAnimationPoseData PoseDataInfo(Pose, ChildrenCurves[I], CustomAttributes);
 
@@ -378,7 +381,9 @@ void FAnimNode_MotionMatching::GetBlendPose(const float DT, FTransform & OutRoot
 				ChildrenWeights[i] = ChildrenWeights[i] / Sum;
 			}
 
-			FAnimationRuntime::BlendPosesTogether(ChildrenPosesView, ChildrenCurves, ChildrenWeights, OutPose, OutCurve);
+			FStackCustomAttributes ChildAttibute;
+			FAnimationPoseData OutAnimationPoseData(OutPose, OutCurve, ChildAttibute);
+			FAnimationRuntime::BlendPosesTogether(ChildrenPosesView, ChildrenCurves, ChildrenAttributes, ChildrenWeights,OutAnimationPoseData);
 			OutPose.NormalizeRotations();
 
 			////-----------------------------------------------------------------------------Root Motion Blending 

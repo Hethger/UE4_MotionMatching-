@@ -113,8 +113,8 @@ void SMotionFieldTimeline::Construct(const FArguments& InArgs, TSharedPtr<FUICom
 
 	//NumKeyFramesFromLastRebuild = (MotionField != nullptr) ? MotionField->MotionKeys.Num() : 0;
 	UAnimSequence* SourceAnimation = SourceAnimationAttr.Get();
-	NumKeyFramesFromLastRebuild = (SourceAnimation != nullptr) ? SourceAnimation->GetNumberOfFrames() : 0;
-	NumFramesFromLastRebuild = (SourceAnimation != nullptr) ? SourceAnimation->GetNumberOfFrames() : 0;
+	NumKeyFramesFromLastRebuild = (SourceAnimation != nullptr) ? SourceAnimation->GetNumberOfSampledKeys() : 0;
+	NumFramesFromLastRebuild = (SourceAnimation != nullptr) ? SourceAnimation->GetNumberOfSampledKeys() : 0;
 	RebuildPerFrameBG();
 }
 
@@ -242,7 +242,7 @@ void SMotionFieldTimeline::SetMotionFieldEditorPtr(TWeakPtr<FMotionFieldEditor> 
 void SMotionFieldTimeline::CheckForRebuild(bool bRebuildAll)
 {
 	UAnimSequence* SourceAnimation = SourceAnimationAttr.Get();
-	const int32 NewNumKeyframes = (SourceAnimation != nullptr) ? SourceAnimation->GetNumberOfFrames() : 0;
+	const int32 NewNumKeyframes = (SourceAnimation != nullptr) ? SourceAnimation->GetNumberOfSampledKeys() : 0;
 
 	
 	const bool PendingRebuild = MotionFieldEditorPtr.Get()->GetPendingTimelineRebuild();
@@ -269,7 +269,7 @@ EVisibility SMotionFieldTimeline::NoFramesWarningVisibility() const
 {
 	UAnimSequence* SourceAnimation = SourceAnimationAttr.Get();
 	
-	const int32 TotalNumFrames = (SourceAnimation != nullptr) ? SourceAnimation->GetNumberOfFrames() : 0;;
+	const int32 TotalNumFrames = (SourceAnimation != nullptr) ? SourceAnimation->GetNumberOfSampledKeys() : 0;;
 	return (TotalNumFrames == 0) ? EVisibility::Visible : EVisibility::Collapsed;
 	
 }
@@ -328,7 +328,13 @@ void SSetPropertiesDialog::Construct(const FArguments & InArgs, UMotionField* So
 	SourceMotFil->GetMotionFieldProperties(SetMotionFieldPropertiesSettings->MotionFieldTimeStep, SetMotionFieldPropertiesSettings->MotionFieldTags);
 
 	FPropertyEditorModule& EditModule = FModuleManager::Get().GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
-	FDetailsViewArgs DetailsViewArgs(/*bUpdateFromSelection=*/ false, /*bLockable=*/ false, /*bAllowSearch=*/ false, /*InNameAreaSettings=*/ FDetailsViewArgs::HideNameArea, /*bHideSelectionTip=*/ true);
+	FDetailsViewArgs DetailsViewArgs;
+	DetailsViewArgs.bUpdatesFromSelection = false;
+	DetailsViewArgs.bLockable = false;
+	DetailsViewArgs.bAllowSearch = false;
+	DetailsViewArgs.NameAreaSettings = FDetailsViewArgs::HideNameArea;
+	DetailsViewArgs.bHideSelectionTip = true;
+
 	MainPropertyView = EditModule.CreateDetailView(DetailsViewArgs);
 	MainPropertyView->SetObject(SetMotionFieldPropertiesSettings);
 
@@ -445,7 +451,7 @@ FReply SSetPropertiesDialog::CancelClicked()
 void SSetPropertiesDialog::CloseContainingWindow()
 {
 	FWidgetPath WidgetPath;
-	TSharedPtr<SWindow> ContainingWindow = FSlateApplication::Get().FindWidgetWindow(AsShared(), WidgetPath);
+	TSharedPtr<SWindow> ContainingWindow = FSlateApplication::Get().FindWidgetWindow(AsShared());
 	if (ContainingWindow.IsValid())
 	{
 		ContainingWindow->RequestDestroyWindow();

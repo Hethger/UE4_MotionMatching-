@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 
 #include "Input/Reply.h"
+#include "ContentBrowserDelegates.h"
+
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Engine/Texture2D.h"
@@ -15,6 +17,7 @@
 #include "Widgets/SWidget.h"
 
 #include "IDetailCustomization.h"
+#include "MotionFieldEditor.h"
 
 
 
@@ -33,7 +36,7 @@ public:
 	SLATE_BEGIN_ARGS(SAddNewContextDialog) {}
 	SLATE_END_ARGS()
 
-		void Construct(const FArguments& InArgs, TSharedPtr<class FMotionFieldEditor> InMotionFieldEditorPtr);
+	void Construct(const FArguments& InArgs, TSharedPtr<class FMotionFieldEditor> InMotionFieldEditorPtr);
 
 	~SAddNewContextDialog();
 

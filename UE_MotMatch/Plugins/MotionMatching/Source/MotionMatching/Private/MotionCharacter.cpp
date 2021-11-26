@@ -273,7 +273,7 @@ bool AMotionCharacter::AreSkeletonsCompatible()
 {
 	if ((MotionField != NULL) && (GetMesh()->SkeletalMesh != NULL))
 	{
-		return MotionField->GetMotionFieldSkeleton() == GetMesh()->SkeletalMesh->Skeleton;
+		return MotionField->GetMotionFieldSkeleton() == GetMesh()->SkeletalMesh->GetSkeleton();
 	}
 
 	return false;

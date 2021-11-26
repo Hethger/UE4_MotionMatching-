@@ -10,7 +10,6 @@ public class MotionMatching : ModuleRules
 
         PublicIncludePaths.AddRange(
 			new string[] {
-                "MotionMatching/Public"
 				// ... add public include paths required here ...
 			}
 			);
@@ -18,7 +17,6 @@ public class MotionMatching : ModuleRules
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
-                "MotionMatching/Private",
 				// ... add other private include paths required here ...
 			}
 			);

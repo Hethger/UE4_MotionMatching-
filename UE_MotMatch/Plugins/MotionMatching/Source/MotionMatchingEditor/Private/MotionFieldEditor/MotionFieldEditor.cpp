@@ -25,7 +25,7 @@
 
 #include "Animation/DebugSkelMeshComponent.h"
 
-#include "Classes/AnimPreviewInstance.h"
+#include "AnimPreviewInstance.h"
 
 #include "SContextList.h"
 
@@ -307,7 +307,8 @@ void FMotionFieldEditor::UnregisterTabSpawners(const TSharedRef<class FTabManage
 
 void FMotionFieldEditor::InitMotionFieldEditor(const EToolkitMode::Type Mode, const TSharedPtr< class IToolkitHost >& InitToolkitHost, class UMotionField* InitMotionField)
 {
-	FAssetEditorManager::Get().CloseOtherEditors(InitMotionField, this);
+	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->CloseOtherEditors(InitMotionField, this);
+	//FAssetEditorManager::Get().CloseOtherEditors(InitMotionField, this);
 	MotionFieldBeingEdited = InitMotionField;
 
 	CurrentExtractionContextIndex = INDEX_NONE;
@@ -398,7 +399,7 @@ bool FMotionFieldEditor::SetPreviewComponentSkeletalMesh(USkeletalMesh * Skeleta
 			if (GetPreviewComponentExtraction()->SkeletalMesh)
 			{
 
-				if (GetPreviewComponentExtraction()->SkeletalMesh->Skeleton != SkeletalMesh->Skeleton)
+				if (GetPreviewComponentExtraction()->SkeletalMesh->GetSkeleton() != SkeletalMesh->GetSkeleton())
 				{
 					SetExtractionAnimSequence(NULL);
 
@@ -452,7 +453,7 @@ bool FMotionFieldEditor::SetExtractionAnimSequence(UAnimSequence * AnimSequence)
 	}
 	if (AnimSequence)
 	{
-		if (AnimSequence->GetSkeleton() == GetPreviewComponentExtraction()->SkeletalMesh->Skeleton)
+		if (AnimSequence->GetSkeleton() == GetPreviewComponentExtraction()->SkeletalMesh->GetSkeleton())
 		{
 			GetPreviewComponentExtraction()->EnablePreview(true, AnimSequence);
 			return true;
@@ -899,7 +900,7 @@ uint32 FMotionFieldEditor::GetTotalFrameCount() const
 {
 	if (GetSourceAnimation())
 	{
-		return GetSourceAnimation()->GetNumberOfFrames();
+		return GetSourceAnimation()->GetNumberOfSampledKeys();
 	}
 	return 0;
 }
@@ -909,7 +910,7 @@ uint32 FMotionFieldEditor::GetTotalFrameCountPlusOne() const
 	//return MotionFieldBeingEdited->MotionKeys.Num() + 1;
 	if (GetSourceAnimation())
 	{
-		return GetSourceAnimation()->GetNumberOfFrames() + 1;
+		return GetSourceAnimation()->GetNumberOfSampledKeys() + 1;
 	}
 	return 1;
 }
